@@ -1,0 +1,17 @@
+require 'spec_helper'
+
+module Mongoid
+  describe CollectionSnapshot do
+
+    context "blah" do
+      
+      let!(:somevar) { Model.create }
+
+      it "blah blah" do
+        somevar.should be_nil
+      end
+
+    end
+
+  end
+end

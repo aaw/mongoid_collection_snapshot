@@ -16,6 +16,19 @@ Gem::Specification.new do |s|
     "LICENSE.txt",
     "README.md"
   ]
+  s.files = [
+    "Gemfile",
+    "LICENSE.txt",
+    "README.md",
+    "Rakefile",
+    "VERSION",
+    "lib/mongoid_collection_snapshot.rb",
+    "mongoid_collection_snapshot.gemspec",
+    "spec/models/artwork.rb",
+    "spec/models/average_artist_price.rb",
+    "spec/mongoid/collection_snapshot_spec.rb",
+    "spec/spec_helper.rb"
+  ]
   s.homepage = %q{http://github.com/aaw/mongoid_collection_snapshot}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]

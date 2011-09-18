@@ -1,7 +1,7 @@
 Mongoid Collection Snapshot
 ===========================
 
-Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM.
+Easy maintenance of collections of processed data in MongoDB with the Mongoid ODM.
 
 Example:
 --------

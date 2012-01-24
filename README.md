@@ -91,9 +91,9 @@ in your build or query methods:
       def build
         # ...
         # define map/reduce for average and max aggregations
-	# ...
-	Artwork.collection.map_reduce(map_avg, reduce_avg, :out => collection_snapshot('average'))
-	Artwork.collection.map_reduce(map_max, reduce_max, :out => collection_snapshot('max'))
+        # ...
+        Artwork.collection.map_reduce(map_avg, reduce_avg, :out => collection_snapshot('average'))
+        Artwork.collection.map_reduce(map_max, reduce_max, :out => collection_snapshot('max'))
       end
 
       def average_price(artist)

@@ -3,7 +3,7 @@ require 'spec_helper'
 module Mongoid
   describe CollectionSnapshot do
 
-    context "creating a snapshot" do
+    context "creating a basic snapshot" do
       
       let!(:flowers)     { Artwork.create(:name => 'Flowers', :artist => 'Andy Warhol', :price => 3000000) }
       let!(:guns)        { Artwork.create(:name => 'Guns', :artist => 'Andy Warhol', :price => 1000000) }
@@ -12,11 +12,13 @@ module Mongoid
       it "returns nil if no snapshot has been created" do
         AverageArtistPrice.latest.should be_nil
       end
+
       it "runs the build method on creation" do
         snapshot = AverageArtistPrice.create
         snapshot.average_price('Andy Warhol').should == 2000000
         snapshot.average_price('Damien Hirst').should == 1500000
       end
+
       it "returns the most recent snapshot through the latest methods" do
         first = AverageArtistPrice.create
         first.should == AverageArtistPrice.latest
@@ -31,12 +33,47 @@ module Mongoid
         third = AverageArtistPrice.create
         AverageArtistPrice.latest.should == third        
       end
+
       it "should only maintain at most two of the latest snapshots to support its calculations" do
+        AverageArtistPrice.create
         10.times do
           AverageArtistPrice.create
-          AverageArtistPrice.count.should <= 2
+          AverageArtistPrice.count.should == 2
         end
       end
+
+    end
+
+    context "creating a snapshot containing multiple collections" do
+      
+      it "populates several collections and allows them to be queried" do
+        MultiCollectionSnapshot.latest.should be_nil
+        10.times { MultiCollectionSnapshot.create }
+        MultiCollectionSnapshot.latest.get_names.should == "foo!bar!baz!"
+      end
+
+      it "safely cleans up all collections used by the snapshot" do
+        # Create some collections with names close to the snapshots we'll create
+        Mongoid.master["#{MultiCollectionSnapshot.collection.name}.do.not_delete"].insert({'a' => 1})
+        Mongoid.master["#{MultiCollectionSnapshot.collection.name}.snapshorty"].insert({'a' => 1})
+        Mongoid.master["#{MultiCollectionSnapshot.collection.name}.hello.1"].insert({'a' => 1})
+
+        MultiCollectionSnapshot.create
+        before_create = Mongoid.master.collections.map{ |c| c.name }
+        before_create.length.should > 0
+
+        sleep(1)
+        MultiCollectionSnapshot.create
+        after_create = Mongoid.master.collections.map{ |c| c.name }
+        collections_created = (after_create - before_create).sort
+        collections_created.length.should == 3
+
+        MultiCollectionSnapshot.latest.destroy
+        after_destroy = Mongoid.master.collections.map{ |c| c.name }
+        collections_destroyed = (after_create - after_destroy).sort
+        collections_created.should == collections_destroyed
+      end
+
     end
 
   end

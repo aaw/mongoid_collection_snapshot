@@ -15,7 +15,7 @@ module Mongoid::CollectionSnapshot
 
     before_save :build
     after_save :ensure_at_most_two_instances_exist
-    before_destroy :drop_snapshot_collection
+    before_destroy :drop_snapshot_collections
   end
 
   module ClassMethods
@@ -24,12 +24,18 @@ module Mongoid::CollectionSnapshot
     end
   end
 
-  def collection_snapshot
-    Mongoid.master.collection("#{self.collection.name}.#{workspace_slug}")
+  def collection_snapshot(name=nil)
+    if name
+      Mongoid.master.collection("#{self.collection.name}.#{name}.#{workspace_slug}")
+    else
+      Mongoid.master.collection("#{self.collection.name}.#{workspace_slug}")
+    end
   end
 
-  def drop_snapshot_collection
-    collection_snapshot.drop
+  def drop_snapshot_collections
+    Mongoid.master.collections.each do |collection|
+      collection.drop if collection.name =~ /^#{self.collection.name}\.([^\.]+\.)?#{workspace_slug}$/
+    end
   end
 
   # Since we should always be using the latest instance of this class, this method is

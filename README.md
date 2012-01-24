@@ -3,8 +3,8 @@ Mongoid Collection Snapshot
 
 Easy maintenance of collections of processed data in MongoDB with the Mongoid ODM.
 
-Example:
---------
+Quick example:
+--------------
 
 Suppose that you have a Mongoid model called `Artwork`, stored
 in a MongoDB collection called `artworks` and the underlying documents 
@@ -78,3 +78,31 @@ method `build`, which populates the collection snapshot and any indexes you need
 By default, mongoid_collection_snapshot maintains the most recent two snapshots 
 computed any given time.
 
+Other features
+--------------
+
+You can maintain multiple collections atomically within the same snapshot by
+passing unique collection identifiers to ``collection_snaphot`` when you call it 
+in your build or query methods:
+
+    class ArtistStats
+      include Mongoid::CollectionSnapshot
+
+      def build
+        # ...
+        # define map/reduce for average and max aggregations
+	# ...
+	Artwork.collection.map_reduce(map_avg, reduce_avg, :out => collection_snapshot('average'))
+	Artwork.collection.map_reduce(map_max, reduce_max, :out => collection_snapshot('max'))
+      end
+
+      def average_price(artist)
+        doc = collection_snapshot('average').findOne({'_id.artist': artist})
+        doc['value']['sum']/doc['value']['count']
+      end
+
+      def max_price(artist)
+        doc = collection_snapshot('max').findOne({'_id.artist': artist})
+        doc['value']['max']
+      end
+    end	

@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{mongoid_collection_snapshot}
-  s.version = "0.0.1"
+  s.name = "mongoid_collection_snapshot"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Windsor"]
-  s.date = %q{2011-09-02}
-  s.description = %q{Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM}
-  s.email = %q{aaron.windsor@gmail.com}
+  s.date = "2012-01-24"
+  s.description = "Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM"
+  s.email = "aaron.windsor@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
@@ -26,17 +26,19 @@ Gem::Specification.new do |s|
     "mongoid_collection_snapshot.gemspec",
     "spec/models/artwork.rb",
     "spec/models/average_artist_price.rb",
+    "spec/models/multi_collection_snapshot.rb",
     "spec/mongoid/collection_snapshot_spec.rb",
     "spec/spec_helper.rb"
   ]
-  s.homepage = %q{http://github.com/aaw/mongoid_collection_snapshot}
+  s.homepage = "http://github.com/aaw/mongoid_collection_snapshot"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
-  s.summary = %q{Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM}
+  s.rubygems_version = "1.8.10"
+  s.summary = "Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM"
   s.test_files = [
     "spec/models/artwork.rb",
     "spec/models/average_artist_price.rb",
+    "spec/models/multi_collection_snapshot.rb",
     "spec/mongoid/collection_snapshot_spec.rb",
     "spec/spec_helper.rb"
   ]

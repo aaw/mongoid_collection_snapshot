@@ -26,14 +26,14 @@ module Mongoid::CollectionSnapshot
 
   def collection_snapshot(name=nil)
     if name
-      Mongoid.master.collection("#{self.collection.name}.#{name}.#{workspace_slug}")
+      Mongoid.default_session["#{self.collection.name}.#{name}.#{workspace_slug}"]
     else
-      Mongoid.master.collection("#{self.collection.name}.#{workspace_slug}")
+      Mongoid.default_session["#{self.collection.name}.#{workspace_slug}"]
     end
   end
 
   def drop_snapshot_collections
-    Mongoid.master.collections.each do |collection|
+    Mongoid.default_session.collections.each do |collection|
       collection.drop if collection.name =~ /^#{self.collection.name}\.([^\.]+\.)?#{workspace_slug}$/
     end
   end

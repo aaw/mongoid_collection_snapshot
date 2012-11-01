@@ -1,7 +1,7 @@
 Mongoid Collection Snapshot
 ===========================
 
-Easy maintenance of collections of processed data in MongoDB with the Mongoid ODM.
+Easy maintenance of collections of processed data in MongoDB with the Mongoid 3.x ODM.
 
 Quick example:
 --------------
@@ -10,13 +10,13 @@ Suppose that you have a Mongoid model called `Artwork`, stored
 in a MongoDB collection called `artworks` and the underlying documents 
 look something like:
 
-  { name: 'Flowers', artist: 'Andy Warhol', price: 3000000 }
+    { name: 'Flowers', artist: 'Andy Warhol', price: 3000000 }
 
 From time to time, your system runs a map/reduce job to compute the
 average price of each artist's works, resulting in a collection called
 `artist_average_price` that contains documents that look like:
 
-  { _id: { artist: 'Andy Warhol'}, value: { price: 1500000 } }
+    { _id: { artist: 'Andy Warhol'}, value: { price: 1500000 } }
 
 If your system wants to maintain and use this average price data, it has 
 to do so at the level of raw MongoDB operations, since
@@ -55,11 +55,15 @@ In the example above, we'd set up our average artist price collection like:
           }
         EOS
 
-        Artwork.collection.map_reduce(map, reduce, :out => collection_snapshot.name)
+        Mongoid.default_session.command(
+          "mapreduce" => "artworks",
+          map: map,
+          reduce: reduce,
+          out: collection_snapshot.name)
       end
 
       def average_price(artist)
-        doc = collection_snapshot.findOne({'_id.artist': artist})
+        doc = collection_snapshot.find({'_id.artist': artist}).first
         doc['value']['sum']/doc['value']['count']
       end
     end
@@ -92,17 +96,17 @@ in your build or query methods:
         # ...
         # define map/reduce for average and max aggregations
         # ...
-        Artwork.collection.map_reduce(map_avg, reduce_avg, :out => collection_snapshot('average'))
-        Artwork.collection.map_reduce(map_max, reduce_max, :out => collection_snapshot('max'))
+        Mongoid.default_session.command("mapreduce" => "artworks", map: map_avg, reduce: reduce_avg, out: collection_snapshot('average'))
+        Mongoid.default_session.command("mapreduce" => "artworks", map: map_max, reduce: reduce_max, out: collection_snapshot('max'))
       end
 
       def average_price(artist)
-        doc = collection_snapshot('average').findOne({'_id.artist': artist})
+        doc = collection_snapshot('average').find({'_id.artist': artist}).first
         doc['value']['sum']/doc['value']['count']
       end
 
       def max_price(artist)
-        doc = collection_snapshot('max').findOne({'_id.artist': artist})
+        doc = collection_snapshot('max').find({'_id.artist': artist}).first
         doc['value']['max']
       end
     end	

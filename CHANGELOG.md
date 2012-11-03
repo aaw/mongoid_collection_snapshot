@@ -1,5 +1,5 @@
-Next Release (1.0)
-==================
+Next Release (0.2.0)
+====================
 
 * Added ability to maintain a snapshot of multiple collections atomically - [@aaw](https://github.com/aaw).
 * Added support for [Mongoid 3.0](https://github.com/mongoid/mongoid) - [@dblock](https://github.com/dblock).

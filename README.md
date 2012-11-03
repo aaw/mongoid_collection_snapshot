@@ -33,47 +33,51 @@ of Mongoid.
 
 In the example above, we'd set up our average artist price collection like:
 
-    class AverageArtistPrice
-      include Mongoid::CollectionSnapshot
+``` ruby
+class AverageArtistPrice
+  include Mongoid::CollectionSnapshot
 
-      def build
-        map = <<-EOS
-          function() {
-            emit({artist: this['artist']}, {count: 1, sum: this['price']})
-          }
-        EOS
+  def build
+    map = <<-EOS
+      function() {
+        emit({artist: this['artist']}, {count: 1, sum: this['price']})
+      }
+    EOS
 
-        reduce = <<-EOS
-          function(key, values) {
-            var sum = 0;
-            var count = 0;
-            values.forEach(function(value) {
-              sum += value['price'];
-              count += value['count'];
-            });
-            return({count: count, sum: sum});
-          }
-        EOS
+    reduce = <<-EOS
+      function(key, values) {
+        var sum = 0;
+        var count = 0;
+        values.forEach(function(value) {
+          sum += value['price'];
+          count += value['count'];
+        });
+        return({count: count, sum: sum});
+      }
+    EOS
 
-        Mongoid.default_session.command(
-          "mapreduce" => "artworks",
-          map: map,
-          reduce: reduce,
-          out: collection_snapshot.name)
-      end
+    Mongoid.default_session.command(
+      "mapreduce" => "artworks",
+      map: map,
+      reduce: reduce,
+      out: collection_snapshot.name)
+  end
 
-      def average_price(artist)
-        doc = collection_snapshot.find({'_id.artist': artist}).first
-        doc['value']['sum']/doc['value']['count']
-      end
-    end
+  def average_price(artist)
+    doc = collection_snapshot.find({'_id.artist': artist}).first
+    doc['value']['sum']/doc['value']['count']
+  end
+end
+```
 
 Now, if you want
 to schedule a recomputation, just call `AverageArtistPrice.create`. The latest
 snapshot is always available as `AverageArtistPrice.latest`, so you can write
 code like:
 
-    warhol_expected_price = AverageArtistPrice.latest.average_price('Andy Warhol')
+``` ruby
+warhol_expected_price = AverageArtistPrice.latest.average_price('Andy Warhol')
+```
 
 And always be sure that you'll never be looking at partial results. The only
 thing you need to do to hook into mongoid_collection_snapshot is implement the
@@ -89,24 +93,31 @@ You can maintain multiple collections atomically within the same snapshot by
 passing unique collection identifiers to ``collection_snaphot`` when you call it 
 in your build or query methods:
 
-    class ArtistStats
-      include Mongoid::CollectionSnapshot
+``` ruby
+class ArtistStats
+  include Mongoid::CollectionSnapshot
 
-      def build
-        # ...
-        # define map/reduce for average and max aggregations
-        # ...
-        Mongoid.default_session.command("mapreduce" => "artworks", map: map_avg, reduce: reduce_avg, out: collection_snapshot('average'))
-        Mongoid.default_session.command("mapreduce" => "artworks", map: map_max, reduce: reduce_max, out: collection_snapshot('max'))
-      end
+  def build
+    # ...
+    # define map/reduce for average and max aggregations
+    # ...
+    Mongoid.default_session.command("mapreduce" => "artworks", map: map_avg, reduce: reduce_avg, out: collection_snapshot('average'))
+    Mongoid.default_session.command("mapreduce" => "artworks", map: map_max, reduce: reduce_max, out: collection_snapshot('max'))
+  end
 
-      def average_price(artist)
-        doc = collection_snapshot('average').find({'_id.artist': artist}).first
-        doc['value']['sum']/doc['value']['count']
-      end
+  def average_price(artist)
+    doc = collection_snapshot('average').find({'_id.artist': artist}).first
+    doc['value']['sum']/doc['value']['count']
+  end
 
-      def max_price(artist)
-        doc = collection_snapshot('max').find({'_id.artist': artist}).first
-        doc['value']['max']
-      end
-    end	
+  def max_price(artist)
+    doc = collection_snapshot('max').find({'_id.artist': artist}).first
+    doc['value']['max']
+  end
+end
+```
+
+License
+=======
+
+MIT License, see [LICENSE.txt](https://github.com/aaw/mongoid_collection_snapshot/blob/master/LICENSE.txt) for details.

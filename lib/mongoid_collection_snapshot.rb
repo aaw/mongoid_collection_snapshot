@@ -9,7 +9,7 @@ module Mongoid::CollectionSnapshot
     include Mongoid::Slug
 
     field :workspace_basename, default: 'snapshot'
-    slug :workspace_basename, as: :workspace_slug
+    slug :workspace_basename
     
     field :max_collection_snapshot_instances, default: 2
 
@@ -26,15 +26,15 @@ module Mongoid::CollectionSnapshot
 
   def collection_snapshot(name=nil)
     if name
-      Mongoid.default_session["#{self.collection.name}.#{name}.#{workspace_slug}"]
+      Mongoid.default_session["#{self.collection.name}.#{name}.#{slug}"]
     else
-      Mongoid.default_session["#{self.collection.name}.#{workspace_slug}"]
+      Mongoid.default_session["#{self.collection.name}.#{slug}"]
     end
   end
 
   def drop_snapshot_collections
     Mongoid.default_session.collections.each do |collection|
-      collection.drop if collection.name =~ /^#{self.collection.name}\.([^\.]+\.)?#{workspace_slug}$/
+      collection.drop if collection.name =~ /^#{self.collection.name}\.([^\.]+\.)?#{slug}$/
     end
   end
 

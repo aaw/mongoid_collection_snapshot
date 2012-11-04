@@ -54,22 +54,22 @@ module Mongoid
 
       it "safely cleans up all collections used by the snapshot" do
         # Create some collections with names close to the snapshots we'll create
-        Mongoid.master["#{MultiCollectionSnapshot.collection.name}.do.not_delete"].insert({'a' => 1})
-        Mongoid.master["#{MultiCollectionSnapshot.collection.name}.snapshorty"].insert({'a' => 1})
-        Mongoid.master["#{MultiCollectionSnapshot.collection.name}.hello.1"].insert({'a' => 1})
+        Mongoid.default_session["#{MultiCollectionSnapshot.collection.name}.do.not_delete"].insert({'a' => 1})
+        Mongoid.default_session["#{MultiCollectionSnapshot.collection.name}.snapshorty"].insert({'a' => 1})
+        Mongoid.default_session["#{MultiCollectionSnapshot.collection.name}.hello.1"].insert({'a' => 1})
 
         MultiCollectionSnapshot.create
-        before_create = Mongoid.master.collections.map{ |c| c.name }
+        before_create = Mongoid.default_session.collections.map{ |c| c.name }
         before_create.length.should > 0
 
         sleep(1)
         MultiCollectionSnapshot.create
-        after_create = Mongoid.master.collections.map{ |c| c.name }
+        after_create = Mongoid.default_session.collections.map{ |c| c.name }
         collections_created = (after_create - before_create).sort
         collections_created.length.should == 3
 
         MultiCollectionSnapshot.latest.destroy
-        after_destroy = Mongoid.master.collections.map{ |c| c.name }
+        after_destroy = Mongoid.default_session.collections.map{ |c| c.name }
         collections_destroyed = (after_create - after_destroy).sort
         collections_created.should == collections_destroyed
       end

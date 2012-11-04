@@ -8,7 +8,7 @@ class MultiCollectionSnapshot
   end
 
   def get_names
-    ['foo', 'bar', 'baz'].map{ |x| collection_snapshot(x).find_one['name'] }.join('')
+    ['foo', 'bar', 'baz'].map{ |x| collection_snapshot(x).find.first['name'] }.join('')
   end
 
 end

@@ -20,11 +20,15 @@ class AverageArtistPrice
       }
     EOS
 
-    Artwork.collection.map_reduce(map, reduce, :out => collection_snapshot.name)
+    Mongoid.default_session.command(
+      "mapreduce" => "artworks",
+      map: map,
+      reduce: reduce,
+      out: collection_snapshot.name)
   end
 
   def average_price(artist)
-    doc = collection_snapshot.find_one({'_id.artist' => artist})
+    doc = collection_snapshot.where({'_id.artist' => artist}).first
     doc['value']['sum']/doc['value']['count']
   end
 

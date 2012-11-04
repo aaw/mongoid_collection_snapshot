@@ -5,20 +5,18 @@ require 'rspec'
 require 'mongoid'
 
 Mongoid.configure do |config|
-  name = "mongoid_collection_snapshot_test"
-  config.master = Mongo::Connection.new.db(name)
-  config.logger = Logger.new('/dev/null')
+  config.connect_to("mongoid_collection_snapshot_test")
 end
 
 require File.expand_path("../../lib/mongoid_collection_snapshot", __FILE__)
 Dir["#{File.dirname(__FILE__)}/models/**/*.rb"].each { |f| require f }
 
-Rspec.configure do |c|
+RSpec.configure do |c|
   c.before(:each) do
-    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+    Mongoid.purge!
   end
-  c.after(:all) do 
-    Mongoid.master.command({'dropDatabase' => 1})
+  c.after(:all) do
+    Mongoid.default_session.drop
   end
 end
 

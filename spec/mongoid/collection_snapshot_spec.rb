@@ -4,7 +4,7 @@ module Mongoid
   describe CollectionSnapshot do
 
     context "creating a basic snapshot" do
-      
+
       let!(:flowers)     { Artwork.create(:name => 'Flowers', :artist => 'Andy Warhol', :price => 3000000) }
       let!(:guns)        { Artwork.create(:name => 'Guns', :artist => 'Andy Warhol', :price => 1000000) }
       let!(:vinblastine) { Artwork.create(:name => 'Vinblastine', :artist => 'Damien Hirst', :price => 1500000) }
@@ -31,7 +31,7 @@ module Mongoid
         AverageArtistPrice.latest.should == second
         sleep(1)
         third = AverageArtistPrice.create
-        AverageArtistPrice.latest.should == third        
+        AverageArtistPrice.latest.should == third
       end
 
       it "should only maintain at most two of the latest snapshots to support its calculations" do
@@ -45,7 +45,7 @@ module Mongoid
     end
 
     context "creating a snapshot containing multiple collections" do
-      
+
       it "populates several collections and allows them to be queried" do
         MultiCollectionSnapshot.latest.should be_nil
         10.times { MultiCollectionSnapshot.create }

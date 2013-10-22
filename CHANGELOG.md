@@ -1,5 +1,10 @@
-Version 0.2.0
-=============
+Next Release
+------------
+
+* Compatibility with Mongoid 4.x - [@dblock](https://github.com/dblock).
+
+0.2.0
+-----
 
 Important note for those upgrading from 0.1.0 (pre-Mongoid 3.0) to 0.2.0 (Mongoid 3.x): you'll need to upgrade any
 existing snapshots created by mongoid_collection_snapshot 0.1.0 in your database before they're usable. You can
@@ -12,7 +17,7 @@ to upgrade the snapshot class "MySnapshot", you'd enter the following at the mon
 * Added support for [Mongoid 3.0](https://github.com/mongoid/mongoid) - [@dblock](https://github.com/dblock).
 * Relaxed version limitations of [mongoid_slug](https://github.com/digitalplaywright/mongoid-slug) - [@dblock](https://github.com/dblock).
 
-Version 0.1.0
-=============
+0.1.0
+-----
 
 * Initial public release - [@aaw](https://github.com/aaw).

@@ -7,7 +7,7 @@ Quick example:
 --------------
 
 Suppose that you have a Mongoid model called `Artwork`, stored
-in a MongoDB collection called `artworks` and the underlying documents 
+in a MongoDB collection called `artworks` and the underlying documents
 look something like:
 
     { name: 'Flowers', artist: 'Andy Warhol', price: 3000000 }
@@ -18,10 +18,10 @@ average price of each artist's works, resulting in a collection called
 
     { _id: { artist: 'Andy Warhol'}, value: { price: 1500000 } }
 
-If your system wants to maintain and use this average price data, it has 
+If your system wants to maintain and use this average price data, it has
 to do so at the level of raw MongoDB operations, since
 map/reduce result documents don't map well to models in Mongoid.
-Furthermore, even though map/reduce jobs can take some time to run, you probably 
+Furthermore, even though map/reduce jobs can take some time to run, you probably
 want the entire `artist_average_price` collection populated atomically
 from the point of view of your system, since otherwise you don't ever
 know the state of the data in the collection - you could access it in
@@ -29,7 +29,7 @@ the middle of a map/reduce and get partial, incorrect results.
 
 mongoid_collection_snapshot solves this problem by providing an atomic
 view of collections of data like map/reduce results that live outside
-of Mongoid. 
+of Mongoid.
 
 In the example above, we'd set up our average artist price collection like:
 
@@ -83,14 +83,14 @@ And always be sure that you'll never be looking at partial results. The only
 thing you need to do to hook into mongoid_collection_snapshot is implement the
 method `build`, which populates the collection snapshot and any indexes you need.
 
-By default, mongoid_collection_snapshot maintains the most recent two snapshots 
+By default, mongoid_collection_snapshot maintains the most recent two snapshots
 computed any given time.
 
-Other features
---------------
+Multi-collection snapshots
+--------------------------
 
 You can maintain multiple collections atomically within the same snapshot by
-passing unique collection identifiers to ``collection_snaphot`` when you call it 
+passing unique collection identifiers to ``collection_snaphot`` when you call it
 in your build or query methods:
 
 ``` ruby
@@ -115,6 +115,48 @@ class ArtistStats
     doc['value']['max']
   end
 end
+```
+
+Custom database connections
+---------------------------
+
+Your class can specify a custom database for storage of collection snapshots by overriding the `snapshot_session` instance method. In this example, we memoize the connection at the class level to avoid creating many separate connection instances.
+
+```ruby
+class ArtistStats
+  include Mongoid::CollectionSnapshot
+
+  def build
+    # ...
+  end
+
+  def snapshot_session
+    self.class.snapshot_session
+  end
+
+  def self.snapshot_session
+    @@snapshot_session ||= Moped::Session.new(['127.0.0.1:27017']).tap do |s|
+      s.use :alternate_db
+    end
+  end
+end
+```
+
+Another common way of configuring this is through mongoid.yml.
+
+```yaml
+development:
+  sessions:
+    default:
+      database: dev_data
+    imports:
+      database: dev_imports
+```
+
+```ruby
+  def snapshot_session
+    Mongoid.session('imports')
+  end
 ```
 
 License

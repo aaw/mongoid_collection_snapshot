@@ -76,5 +76,26 @@ module Mongoid
 
     end
 
+    context "with a custom snapshot connection" do
+
+      around(:each) do |example|
+        CustomConnectionSnapshot.snapshot_session.drop
+        example.run
+        CustomConnectionSnapshot.snapshot_session.drop
+      end
+
+      it "builds snapshot in custom database" do
+        snapshot = CustomConnectionSnapshot.create
+        [
+          "#{CustomConnectionSnapshot.collection.name}.foo.#{snapshot.slug}",
+          "#{CustomConnectionSnapshot.collection.name}.#{snapshot.slug}"
+        ].each do |collection_name|
+          Mongoid.default_session[collection_name].find.count.should == 0
+          CustomConnectionSnapshot.snapshot_session[collection_name].find.count.should == 1
+        end
+      end
+
+    end
+
   end
 end

@@ -1,6 +1,9 @@
 Next Release
 ------------
 
+1.0.0
+-----
+
 * Expose `snapshot_session` for custom snapshot storage - [@joeyAghion](https://github.com/joeyAghion)
 * Compatibility with Mongoid 4.x - [@dblock](https://github.com/dblock).
 

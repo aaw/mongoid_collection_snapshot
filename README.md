@@ -3,6 +3,8 @@ Mongoid Collection Snapshot
 
 Easy maintenance of collections of processed data in MongoDB with the Mongoid 3.x ODM.
 
+[![Build Status](https://travis-ci.org/aaw/mongoid_collection_snapshot.svg)](https://travis-ci.org/aaw/mongoid_collection_snapshot)
+
 Quick example:
 --------------
 

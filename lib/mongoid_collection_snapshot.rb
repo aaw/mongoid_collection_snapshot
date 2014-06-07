@@ -13,8 +13,8 @@ module Mongoid::CollectionSnapshot
     
     field :max_collection_snapshot_instances, default: 2
 
-    before_save :build
-    after_save :ensure_at_most_two_instances_exist
+    before_create :build
+    after_create :ensure_at_most_two_instances_exist
     before_destroy :drop_snapshot_collections
   end
 
@@ -26,14 +26,14 @@ module Mongoid::CollectionSnapshot
 
   def collection_snapshot(name=nil)
     if name
-      Mongoid.default_session["#{self.collection.name}.#{name}.#{slug}"]
+      snapshot_session["#{self.collection.name}.#{name}.#{slug}"]
     else
-      Mongoid.default_session["#{self.collection.name}.#{slug}"]
+      snapshot_session["#{self.collection.name}.#{slug}"]
     end
   end
 
   def drop_snapshot_collections
-    Mongoid.default_session.collections.each do |collection|
+    snapshot_session.collections.each do |collection|
       collection.drop if collection.name =~ /^#{self.collection.name}\.([^\.]+\.)?#{slug}$/
     end
   end
@@ -47,6 +47,11 @@ module Mongoid::CollectionSnapshot
     if all_instances.length > self.max_collection_snapshot_instances
       all_instances[self.max_collection_snapshot_instances..-1].each { |instance| instance.destroy }
     end
+  end
+
+  # Override to supply custom database connection for snapshots
+  def snapshot_session
+    Mongoid.default_session
   end
   
 end

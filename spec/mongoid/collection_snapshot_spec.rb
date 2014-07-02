@@ -3,6 +3,10 @@ require 'spec_helper'
 module Mongoid
   describe CollectionSnapshot do
 
+    it "has a version" do
+      Mongoid::CollectionSnapshot::VERSION.should_not be_nil
+    end
+
     context "creating a basic snapshot" do
 
       let!(:flowers)     { Artwork.create(:name => 'Flowers', :artist => 'Andy Warhol', :price => 3000000) }

@@ -1,16 +1,18 @@
+require 'mongoid_collection_snapshot/version'
+
 module Mongoid::CollectionSnapshot
   extend ActiveSupport::Concern
 
   included do
     require 'mongoid_slug'
-    
+
     include Mongoid::Document
     include Mongoid::Timestamps::Created
     include Mongoid::Slug
 
     field :workspace_basename, default: 'snapshot'
     slug :workspace_basename
-    
+
     field :max_collection_snapshot_instances, default: 2
 
     before_create :build
@@ -53,5 +55,5 @@ module Mongoid::CollectionSnapshot
   def snapshot_session
     Mongoid.default_session
   end
-  
+
 end

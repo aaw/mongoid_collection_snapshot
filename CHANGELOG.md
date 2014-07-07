@@ -1,6 +1,9 @@
 Next Release
 ------------
 
+1.0.1
+-----
+
 * [#8](https://github.com/aaw/mongoid_collection_snapshot/pull/8): Fixed .gemspec for compatibility with Mongoid 4.x - [@dblock](https://github.com/dblock).
 
 1.0.0

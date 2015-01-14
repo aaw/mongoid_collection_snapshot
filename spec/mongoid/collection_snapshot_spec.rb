@@ -7,9 +7,11 @@ module Mongoid
     end
 
     context 'creating a basic snapshot' do
-      let!(:flowers)     { Artwork.create(name: 'Flowers', artist: 'Andy Warhol', price: 3_000_000) }
-      let!(:guns)        { Artwork.create(name: 'Guns', artist: 'Andy Warhol', price: 1_000_000) }
-      let!(:vinblastine) { Artwork.create(name: 'Vinblastine', artist: 'Damien Hirst', price: 1_500_000) }
+      let!(:andy_warhol) { Artist.create!(name: 'Andy Warhol') }
+      let!(:damien_hirst) { Artist.create!(name: 'Damien Hirst') }
+      let!(:flowers) { Artwork.create!(name: 'Flowers', artist: andy_warhol, price: 3_000_000) }
+      let!(:guns) { Artwork.create!(name: 'Guns', artist: andy_warhol, price: 1_000_000) }
+      let!(:vinblastine) { Artwork.create!(name: 'Vinblastine', artist: damien_hirst, price: 1_500_000) }
 
       it 'returns nil if no snapshot has been created' do
         expect(AverageArtistPrice.latest).to be_nil
@@ -36,11 +38,22 @@ module Mongoid
         expect(AverageArtistPrice.latest).to eq(third)
       end
 
-      it 'should only maintain at most two of the latest snapshots to support its calculations' do
+      it 'maintains at most two of the latest snapshots to support its calculations' do
         AverageArtistPrice.create
         10.times do
           AverageArtistPrice.create
           expect(AverageArtistPrice.count).to eq(2)
+        end
+      end
+
+      context '#documents' do
+        it 'provides access to a Mongoid collection' do
+          snapshot = AverageArtistPrice.create
+          expect(snapshot.documents.count).to eq 2
+          document = snapshot.documents.where(artist: andy_warhol).first
+          expect(document.artist).to eq andy_warhol
+          expect(document.count).to eq 2
+          expect(document.sum).to eq 4_000_000
         end
       end
     end
@@ -90,6 +103,14 @@ module Mongoid
         ].each do |collection_name|
           expect(Mongoid.default_session[collection_name].find.count).to eq(0)
           expect(CustomConnectionSnapshot.snapshot_session[collection_name].find.count).to eq(1)
+        end
+      end
+
+      context '#documents' do
+        it 'provides access to a Mongoid collection' do
+          snapshot = CustomConnectionSnapshot.create
+          expect(snapshot.collection_snapshot.find.count).to eq 1
+          expect(snapshot.documents.count).to eq 1
         end
       end
     end

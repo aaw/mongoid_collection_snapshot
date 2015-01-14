@@ -4,6 +4,8 @@ module Mongoid
   module CollectionSnapshot
     extend ActiveSupport::Concern
 
+    DEFAULT_COLLECTION_KEY_NAME = '*'
+
     included do
       require 'mongoid_slug'
 
@@ -19,11 +21,36 @@ module Mongoid
       before_create :build
       after_create :ensure_at_most_two_instances_exist
       before_destroy :drop_snapshot_collections
+
+      cattr_accessor :document_blocks
+
+      # Mongoid documents on this snapshot.
+      def documents(name = nil)
+        @documents ||= {}
+        @documents[name || DEFAULT_COLLECTION_KEY_NAME] ||= begin
+          document_block = document_blocks[name || DEFAULT_COLLECTION_KEY_NAME] if document_blocks
+          collection_name = collection_snapshot(name).name
+          collection_database = snapshot_session.options[:database]
+          class_name = "#{self.class.name}_#{slug}_#{name}_#{SecureRandom.uuid}".underscore.camelize
+          klass = Class.new do
+            include Mongoid::Document
+            instance_eval(&document_block) if document_block
+            store_in collection: collection_name, database: collection_database
+          end
+          Object.const_set(class_name, klass)
+          klass
+        end
+      end
     end
 
     module ClassMethods
       def latest
         order_by([[:created_at, :desc]]).first
+      end
+
+      def document(name = nil, &block)
+        self.document_blocks ||= {}
+        self.document_blocks[name || DEFAULT_COLLECTION_KEY_NAME] = block
       end
     end
 

@@ -1,10 +1,16 @@
 class AverageArtistPrice
   include Mongoid::CollectionSnapshot
 
+  document do
+    belongs_to :artist, inverse_of: nil
+    field :sum, type: Integer
+    field :count, type: Integer
+  end
+
   def build
     map = <<-EOS
       function() {
-        emit({artist: this['artist']}, {count: 1, sum: this['price']})
+        emit({ artist_id: this['artist_id']}, { count: 1, sum: this['price'] })
       }
     EOS
 
@@ -16,19 +22,24 @@ class AverageArtistPrice
           sum += value['sum'];
           count += value['count'];
         });
-        return({count: count, sum: sum});
+        return({ count: count, sum: sum });
       }
     EOS
 
-    Mongoid.default_session.command(
-      'mapreduce' => 'artworks',
-      map: map,
-      reduce: reduce,
-      out: collection_snapshot.name)
+    Artwork.map_reduce(map, reduce).out(inline: 1).each do |doc|
+      collection_snapshot.insert(
+        artist_id: doc['_id']['artist_id'],
+        count: doc['value']['count'],
+        sum: doc['value']['sum']
+      )
+    end
   end
 
-  def average_price(artist)
-    doc = collection_snapshot.where('_id.artist' => artist).first
-    doc['value']['sum'] / doc['value']['count']
+  def average_price(artist_name)
+    artist = Artist.where(name: artist_name).first
+    fail 'missing artist' unless artist
+    doc = documents.where(artist: artist).first
+    fail 'missing record' unless doc
+    doc.sum / doc.count
   end
 end

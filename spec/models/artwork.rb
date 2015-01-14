@@ -2,6 +2,7 @@ class Artwork
   include Mongoid::Document
 
   field :name
-  field :artist
   field :price
+
+  belongs_to :artist
 end

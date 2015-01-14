@@ -3,6 +3,7 @@ require 'bundler/setup'
 require 'rspec'
 
 require 'mongoid'
+require 'timecop'
 
 Mongoid.configure do |config|
   config.connect_to('mongoid_collection_snapshot_test')

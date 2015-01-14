@@ -28,10 +28,10 @@ module Mongoid
         # module is meant to snapshot long-running collection creation, so if you need a resolution of less
         # than a second for "latest" then you're probably using the wrong gem. In tests, sleeping for a second
         # makes sure we get what we expect.
-        sleep(1)
+        Timecop.travel(1.second.from_now)
         second = AverageArtistPrice.create
         expect(AverageArtistPrice.latest).to eq(second)
-        sleep(1)
+        Timecop.travel(1.second.from_now)
         third = AverageArtistPrice.create
         expect(AverageArtistPrice.latest).to eq(third)
       end
@@ -62,7 +62,7 @@ module Mongoid
         before_create = Mongoid.default_session.collections.map(&:name)
         expect(before_create.length).to be > 0
 
-        sleep(1)
+        Timecop.travel(1.second.from_now)
         MultiCollectionSnapshot.create
         after_create = Mongoid.default_session.collections.map(&:name)
         collections_created = (after_create - before_create).sort

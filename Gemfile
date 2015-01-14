@@ -14,4 +14,5 @@ gem 'mongoid_slug'
 group :development, :test do
   gem 'rspec', '~> 3.1'
   gem 'rake'
+  gem 'timecop'
 end

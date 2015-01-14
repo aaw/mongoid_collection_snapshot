@@ -20,3 +20,6 @@ RSpec.configure do |c|
   end
 end
 
+RSpec.configure do |config|
+  config.raise_errors_for_deprecations!
+end

@@ -12,7 +12,7 @@ end
 gem "mongoid_slug"
 
 group :development, :test do
-  gem "rspec", "~> 2.11.0"
+  gem "rspec", "~> 3.1"
   gem "rake"
 end
 

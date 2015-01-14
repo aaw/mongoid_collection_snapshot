@@ -1,6 +1,9 @@
 Next Release
 ------------
 
+* Upgraded RSpec - [@dblock](https://github.com/dblock).
+* Your contribution here.
+
 1.0.1
 -----
 

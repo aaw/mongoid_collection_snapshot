@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
 case version = ENV['MONGOID_VERSION'] || '~> 4.0'
 when /4/
@@ -9,10 +9,9 @@ else
   gem 'mongoid', version
 end
 
-gem "mongoid_slug"
+gem 'mongoid_slug'
 
 group :development, :test do
-  gem "rspec", "~> 3.1"
-  gem "rake"
+  gem 'rspec', '~> 3.1'
+  gem 'rake'
 end
-

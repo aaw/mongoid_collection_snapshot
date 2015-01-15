@@ -55,6 +55,14 @@ module Mongoid
           expect(document.count).to eq 2
           expect(document.sum).to eq 4_000_000
         end
+
+        it 'only creates one global class reference' do
+          2.times do
+            index = AverageArtistPrice.create
+            2.times { expect(index.documents.count).to eq 2 }
+          end
+          expect(AverageArtistPrice.document_classes.count).to eq 2
+        end
       end
     end
 

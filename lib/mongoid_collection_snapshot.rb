@@ -28,8 +28,8 @@ module Mongoid
       # Mongoid documents on this snapshot.
       def documents(name = nil)
         self.document_classes ||= {}
-        class_name = "#{self.class.name}_#{slug}_#{name}".underscore.camelize
-        key = "#{class_name}_#{name || DEFAULT_COLLECTION_KEY_NAME}"
+        class_name = "#{self.class.name}#{id}#{name}".underscore.camelize
+        key = "#{class_name}-#{name || DEFAULT_COLLECTION_KEY_NAME}"
         self.document_classes[key] ||= begin
           document_block = document_blocks[name || DEFAULT_COLLECTION_KEY_NAME] if document_blocks
           collection_name = collection_snapshot(name).name

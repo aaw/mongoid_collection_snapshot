@@ -33,12 +33,13 @@ module Mongoid
         self.document_classes[key] ||= begin
           document_block = document_blocks[name || DEFAULT_COLLECTION_KEY_NAME] if document_blocks
           collection_name = collection_snapshot(name).name
-          collection_database = snapshot_session.options[:database]
           klass = Class.new do
             include Mongoid::Document
+            cattr_accessor :mongo_session
             instance_eval(&document_block) if document_block
-            store_in collection: collection_name, database: collection_database
+            store_in collection: collection_name
           end
+          klass.mongo_session = snapshot_session
           Object.const_set(class_name, klass)
           klass
         end

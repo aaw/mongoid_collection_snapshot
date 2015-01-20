@@ -115,6 +115,9 @@ module Mongoid
       end
 
       context '#documents' do
+        it 'uses the custom session' do
+          expect(CustomConnectionSnapshot.new.documents.mongo_session).to eq CustomConnectionSnapshot.snapshot_session
+        end
         it 'provides access to a Mongoid collection' do
           snapshot = CustomConnectionSnapshot.create
           expect(snapshot.collection_snapshot.find.count).to eq 1

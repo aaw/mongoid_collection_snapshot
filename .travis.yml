@@ -13,3 +13,5 @@ env:
 language: ruby
 
 cache: bundler
+
+sudo: false

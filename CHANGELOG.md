@@ -1,6 +1,10 @@
 Next Release
 ------------
 
+* [#11](https://github.com/aaw/mongoid_collection_snapshot/pull/10): Added support for accessing snapshot collection documents via Mongoid::CollectionSnapshot#documents - [@dblock](https://github.com/dblock).
+* [#11](https://github.com/aaw/mongoid_collection_snapshot/pull/11): Upgraded RSpec - [@dblock](https://github.com/dblock).
+* Your contribution here.
+
 1.0.1
 -----
 

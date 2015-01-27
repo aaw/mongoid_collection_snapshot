@@ -3,12 +3,13 @@ require 'bundler/setup'
 require 'rspec'
 
 require 'mongoid'
+require 'timecop'
 
 Mongoid.configure do |config|
-  config.connect_to("mongoid_collection_snapshot_test")
+  config.connect_to('mongoid_collection_snapshot_test')
 end
 
-require File.expand_path("../../lib/mongoid_collection_snapshot", __FILE__)
+require File.expand_path('../../lib/mongoid_collection_snapshot', __FILE__)
 Dir["#{File.dirname(__FILE__)}/models/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |c|
@@ -20,3 +21,4 @@ RSpec.configure do |c|
   end
 end
 
+RSpec.configure(&:raise_errors_for_deprecations!)

@@ -1,7 +1,7 @@
 Mongoid Collection Snapshot
 ===========================
 
-Easy maintenance of collections of processed data in MongoDB with the Mongoid 3.x ODM.
+Easy maintenance of collections of processed data in MongoDB with the Mongoid 3, 4 and 5.
 
 [![Build Status](https://travis-ci.org/aaw/mongoid_collection_snapshot.svg)](https://travis-ci.org/aaw/mongoid_collection_snapshot)
 
@@ -48,7 +48,7 @@ class AverageArtistPrice
     EOS
 
     Artwork.map_reduce(map, reduce).out(inline: 1).each do |doc|
-      collection_snapshot.insert(
+      collection_snapshot.insert_one(
         artist_id: doc['_id']['artist_id'],
         count: doc['value']['count'],
         sum: doc['value']['sum']
@@ -190,8 +190,8 @@ class ArtistStats
   end
 
   def self.snapshot_session
-    @@snapshot_session ||= Moped::Session.new(['127.0.0.1:27017']).tap do |s|
-      s.use :alternate_db
+    @@snapshot_session ||= Mongo::Client.new('mongodb://localhost:27017').tap do |c|
+      c.use :alternate_db
     end
   end
 end

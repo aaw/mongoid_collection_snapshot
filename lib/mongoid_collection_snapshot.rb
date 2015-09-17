@@ -35,11 +35,19 @@ module Mongoid
           collection_name = collection_snapshot(name).name
           klass = Class.new do
             include Mongoid::Document
-            cattr_accessor :mongo_session
+            if Mongoid::Compatibility::Version::mongoid5?
+              cattr_accessor :mongo_client
+            else
+              cattr_accessor :mongo_session
+            end
             instance_eval(&document_block) if document_block
             store_in collection: collection_name
           end
-          klass.mongo_session = snapshot_session
+          if Mongoid::Compatibility::Version.mongoid5?
+            klass.mongo_client = snapshot_session
+          else
+            klass.mongo_session = snapshot_session
+          end
           Object.const_set(class_name, klass)
           klass
         end
@@ -66,7 +74,8 @@ module Mongoid
     end
 
     def drop_snapshot_collections
-      snapshot_session.collections.each do |collection|
+      collections = Mongoid::Compatibility::Version.mongoid5? ? snapshot_session.database.collections : snapshot_session.collections
+      collections.each do |collection|
         collection.drop if collection.name =~ /^#{self.collection.name}\.([^\.]+\.)?#{slug}$/
       end
     end
@@ -83,7 +92,7 @@ module Mongoid
 
     # Override to supply custom database connection for snapshots
     def snapshot_session
-      Mongoid.default_session
+      Mongoid::Compatibility::Version.mongoid5? ? Mongoid.default_client : Mongoid.default_session
     end
   end
 end

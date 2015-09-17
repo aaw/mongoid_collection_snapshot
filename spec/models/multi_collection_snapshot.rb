@@ -17,9 +17,15 @@ class MultiCollectionSnapshot
   end
 
   def build
-    collection_snapshot('foo').insert('name' => 'foo!', count: 1)
-    collection_snapshot('bar').insert('name' => 'bar!', number: 2)
-    collection_snapshot('baz').insert('name' => 'baz!', digit: 3)
+    if Mongoid::Compatibility::Version.mongoid5?
+      collection_snapshot('foo').insert_one('name' => 'foo!', count: 1)
+      collection_snapshot('bar').insert_one('name' => 'bar!', number: 2)
+      collection_snapshot('baz').insert_one('name' => 'baz!', digit: 3)
+    else
+      collection_snapshot('foo').insert('name' => 'foo!', count: 1)
+      collection_snapshot('bar').insert('name' => 'bar!', number: 2)
+      collection_snapshot('baz').insert('name' => 'baz!', digit: 3)
+    end
   end
 
   def names

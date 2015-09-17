@@ -12,12 +12,22 @@ end
 require File.expand_path('../../lib/mongoid_collection_snapshot', __FILE__)
 Dir["#{File.dirname(__FILE__)}/models/**/*.rb"].each { |f| require f }
 
+require 'mongoid-compatibility'
+
 RSpec.configure do |c|
+  c.before(:all) do
+    Mongoid.logger.level = Logger::INFO
+    Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5?
+  end
   c.before(:each) do
     Mongoid.purge!
   end
   c.after(:all) do
-    Mongoid.default_session.drop
+    if Mongoid::Compatibility::Version.mongoid5?
+      Mongoid.default_client.database.drop
+    else
+      Mongoid.default_session.drop
+    end
   end
 end
 

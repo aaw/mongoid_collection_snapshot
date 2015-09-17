@@ -27,11 +27,19 @@ class AverageArtistPrice
     EOS
 
     Artwork.map_reduce(map, reduce).out(inline: 1).each do |doc|
-      collection_snapshot.insert(
-        artist_id: doc['_id']['artist_id'],
-        count: doc['value']['count'],
-        sum: doc['value']['sum']
-      )
+      if Mongoid::Compatibility::Version.mongoid5?
+        collection_snapshot.insert_one(
+          artist_id: doc['_id']['artist_id'],
+          count: doc['value']['count'],
+          sum: doc['value']['sum']
+        )
+      else
+        collection_snapshot.insert(
+          artist_id: doc['_id']['artist_id'],
+          count: doc['value']['count'],
+          sum: doc['value']['sum']
+        )
+      end
     end
   end
 

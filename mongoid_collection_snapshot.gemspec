@@ -14,5 +14,6 @@ Gem::Specification.new do |s|
   s.licenses = ['MIT']
   s.summary = 'Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM.'
   s.add_dependency 'mongoid', '>= 3.0'
-  s.add_dependency 'mongoid_slug'
+  s.add_dependency 'mongoid-compatibility'
+  s.add_dependency 'mongoid-slug'
 end

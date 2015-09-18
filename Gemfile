@@ -1,6 +1,11 @@
 source 'http://rubygems.org'
 
-case version = ENV['MONGOID_VERSION'] || '~> 4.0'
+gemspec
+
+case version = ENV['MONGOID_VERSION'] || '~> 5.0'
+when /5/
+  gem 'mongoid', '~> 5.0'
+  gem 'mongoid-slug', github: 'dblock/mongoid-slug', branch: 'mongoid-5'
 when /4/
   gem 'mongoid', '~> 4.0'
 when /3/
@@ -8,8 +13,6 @@ when /3/
 else
   gem 'mongoid', version
 end
-
-gem 'mongoid_slug'
 
 group :development, :test do
   gem 'rspec', '~> 3.1'
